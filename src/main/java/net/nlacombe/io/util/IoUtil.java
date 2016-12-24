@@ -9,6 +9,9 @@ import java.nio.ByteBuffer;
 
 public class IoUtil
 {
+	private static final Integer BOOLEAN_TRUE_INTEGER = 1;
+	private static final Integer BOOLEAN_FALSE_INTEGER = 0;
+
 	public static int ubyte(byte b)
 	{
 		if (b >= 0)
@@ -35,6 +38,19 @@ public class IoUtil
 	public static int readInteger(InputStream is) throws IOException
 	{
 		return b4toint(read(is, 4));
+	}
+
+	public static void writeBoolean(OutputStream outputStream, boolean bool) throws IOException
+	{
+		Integer integer = bool ? BOOLEAN_TRUE_INTEGER : BOOLEAN_FALSE_INTEGER;
+		outputStream.write(inttob4(integer));
+	}
+
+	public static boolean readBoolean(InputStream inputStream) throws IOException
+	{
+		Integer integer = readInteger(inputStream);
+
+		return integer == BOOLEAN_TRUE_INTEGER;
 	}
 
 	/**
