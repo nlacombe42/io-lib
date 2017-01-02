@@ -2,15 +2,18 @@ package net.nlacombe.io.util;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 public class IoUtil
 {
-	private static final Integer BOOLEAN_TRUE_INTEGER = 1;
-	private static final Integer BOOLEAN_FALSE_INTEGER = 0;
+	private static final int BOOLEAN_TRUE_INTEGER = 1;
+	private static final int BOOLEAN_FALSE_INTEGER = 0;
 
 	public static int ubyte(byte b)
 	{
@@ -42,13 +45,13 @@ public class IoUtil
 
 	public static void writeBoolean(OutputStream outputStream, boolean bool) throws IOException
 	{
-		Integer integer = bool ? BOOLEAN_TRUE_INTEGER : BOOLEAN_FALSE_INTEGER;
+		int integer = bool ? BOOLEAN_TRUE_INTEGER : BOOLEAN_FALSE_INTEGER;
 		outputStream.write(inttob4(integer));
 	}
 
 	public static boolean readBoolean(InputStream inputStream) throws IOException
 	{
-		Integer integer = readInteger(inputStream);
+		int integer = readInteger(inputStream);
 
 		return integer == BOOLEAN_TRUE_INTEGER;
 	}
@@ -65,5 +68,16 @@ public class IoUtil
 		IOUtils.readFully(is, buffer);
 
 		return buffer;
+	}
+
+	public static byte[] serialize(UUID uuid) throws IOException
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(baos);
+
+		dos.writeLong(uuid.getMostSignificantBits());
+		dos.writeLong(uuid.getLeastSignificantBits());
+
+		return baos.toByteArray();
 	}
 }
