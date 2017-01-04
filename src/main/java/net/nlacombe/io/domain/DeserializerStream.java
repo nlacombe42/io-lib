@@ -28,6 +28,11 @@ public class DeserializerStream extends FrameInputStream
 		return IoUtil.deserializeInteger(readFrame());
 	}
 
+	public long readLong() throws IOException
+	{
+		return IoUtil.deserializeLong(readFrame());
+	}
+
 	public boolean readBoolean() throws IOException
 	{
 		byte[] oneByte = IoUtil.read(this, 1);

@@ -25,9 +25,19 @@ public class IoUtil
 		return ByteBuffer.wrap(buffer).getInt();
 	}
 
-	public static byte[] serializeInteger(int integer) throws IOException
+	public static byte[] serializeInteger(int integer)
 	{
 		return ByteBuffer.allocate(4).putInt(integer).array();
+	}
+
+	public static byte[] serializeLong(long longValue)
+	{
+		return ByteBuffer.allocate(8).putLong(longValue).array();
+	}
+
+	public static long deserializeLong(byte[] buffer)
+	{
+		return ByteBuffer.wrap(buffer).getLong();
 	}
 
 	public static byte booleanToByte(boolean bool)

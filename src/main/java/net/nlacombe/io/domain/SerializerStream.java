@@ -23,9 +23,14 @@ public class SerializerStream extends FrameOutputStream
 		writeFrame(string.getBytes(Charsets.UTF_8));
 	}
 
-	public void writeInteger(Integer integer) throws IOException
+	public void writeInteger(int integer) throws IOException
 	{
 		writeFrame(IoUtil.serializeInteger(integer));
+	}
+
+	public void writeLong(long longValue) throws IOException
+	{
+		writeFrame(IoUtil.serializeLong(longValue));
 	}
 
 	public void writeBoolean(boolean b) throws IOException
