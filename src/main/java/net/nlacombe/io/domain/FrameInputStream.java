@@ -29,7 +29,7 @@ public class FrameInputStream extends FilterInputStream
 	private int readFrameSize() throws IOException
 	{
 		if (sizeFieldLength == 1)
-			return IoUtil.ubyte(IoUtil.read(this, 1)[0]);
+			return IoUtil.getUnsignedValueOfByte(IoUtil.read(this, 1)[0]);
 		else if (sizeFieldLength == 2)
 			return ByteBuffer.wrap(IoUtil.read(this, 2)).getShort();
 		else
