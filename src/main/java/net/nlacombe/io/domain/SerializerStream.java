@@ -33,7 +33,7 @@ public class SerializerStream extends FrameOutputStream
 		write(new byte[]{IoUtil.booleanToByte(b)});
 	}
 
-	public void writeuuid(UUID uuid) throws IOException
+	public void writeUuid(UUID uuid) throws IOException
 	{
 		writeFrame(IoUtil.serializeUuid(uuid));
 	}
