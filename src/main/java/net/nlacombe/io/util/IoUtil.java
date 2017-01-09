@@ -5,6 +5,9 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 public class IoUtil
@@ -83,5 +86,14 @@ public class IoUtil
 		IOUtils.readFully(is, buffer);
 
 		return buffer;
+	}
+
+	public static void writeRandomBytes(Path file, Long numberOfBytes) throws IOException
+	{
+		byte[] randomBytes = new byte[numberOfBytes.intValue()];
+
+		new SecureRandom().nextBytes(randomBytes);
+
+		Files.write(file, randomBytes);
 	}
 }
