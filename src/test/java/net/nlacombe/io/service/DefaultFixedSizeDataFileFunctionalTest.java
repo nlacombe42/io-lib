@@ -1,6 +1,7 @@
 package net.nlacombe.io.service;
 
 import net.nlacombe.io.domain.fixedsizedatafile.DataUnitAddress;
+import net.nlacombe.io.domain.fixedsizedatafile.DefaultFixedSizeDataFile;
 import net.nlacombe.io.domain.fixedsizedatafile.FixedSizeDataFile;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -16,9 +17,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class FixedSizeDataFileServiceFunctionalTest
+public class DefaultFixedSizeDataFileFunctionalTest
 {
-	private FixedSizeDataFileService fixedSizeDataFileService = FixedSizeDataFileService.getInstance();
 	private Path filePath;
 
 	@Before
@@ -48,7 +48,7 @@ public class FixedSizeDataFileServiceFunctionalTest
 
 	private DataUnitAddress createFileWithDataUnit(byte[] dataUnit, Path filePath, Long fileSize, Long allocationSize) throws IOException
 	{
-		try (FixedSizeDataFile fixedSizeDataFile = fixedSizeDataFileService.createFixedSizeDataFile(filePath, fileSize, allocationSize))
+		try (FixedSizeDataFile fixedSizeDataFile = new DefaultFixedSizeDataFile(filePath, fileSize, allocationSize))
 		{
 			return fixedSizeDataFile.createDataUnit(dataUnit);
 		}
@@ -56,7 +56,7 @@ public class FixedSizeDataFileServiceFunctionalTest
 
 	private byte[] readDataUnitFromFile(DataUnitAddress dataUnitAddress, Path filePath) throws IOException
 	{
-		try (FixedSizeDataFile fixedSizeDataFile = fixedSizeDataFileService.getFixedSizeDataFile(filePath))
+		try (FixedSizeDataFile fixedSizeDataFile = new DefaultFixedSizeDataFile(filePath))
 		{
 			return fixedSizeDataFile.readDataUnit(dataUnitAddress);
 		}
