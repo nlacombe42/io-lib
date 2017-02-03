@@ -50,8 +50,9 @@ public class FixedSizeDataFileHeader
 
 	private void readAndDeserialize(InputStream inputStream)
 	{
-		try (DeserializerStream ds = new DeserializerStream(inputStream))
+		try
 		{
+			DeserializerStream ds = new DeserializerStream(inputStream);
 			Long allocationUnitSize = ds.readLong();
 			byte[] allocationTableData = ds.readFrame();
 			allocationTable = new ArrayAllocationTable(allocationTableData, allocationUnitSize);

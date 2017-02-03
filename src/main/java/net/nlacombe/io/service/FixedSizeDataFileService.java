@@ -2,7 +2,7 @@ package net.nlacombe.io.service;
 
 import net.nlacombe.io.domain.fixedsizedatafile.FixedSizeDataFile;
 import net.nlacombe.io.domain.fixedsizedatafile.FixedSizeDataFileHeader;
-import net.nlacombe.io.domain.fixedsizedatafile.NonEncryptedFixedSizeDataFile;
+import net.nlacombe.io.domain.fixedsizedatafile.DefaultFixedSizeDataFile;
 import net.nlacombe.io.util.IoUtil;
 
 import java.io.FileInputStream;
@@ -30,33 +30,12 @@ public class FixedSizeDataFileService
 	{
 		validateFileSize(fileSizeInBytes, allocationUnitSizeInBytes);
 
-		FixedSizeDataFileHeader fileHeader = new FixedSizeDataFileHeader(fileSizeInBytes, allocationUnitSizeInBytes);
-
-		IoUtil.writeRandomBytes(filePath, fileSizeInBytes);
-		writeFileHeader(fileHeader);
-
-		return new NonEncryptedFixedSizeDataFile(filePath, fileHeader);
+		return new DefaultFixedSizeDataFile(filePath, fileSizeInBytes, allocationUnitSizeInBytes);
 	}
 
 	public FixedSizeDataFile getFixedSizeDataFile(Path filePath) throws IOException
 	{
-		FixedSizeDataFileHeader fileHeader = readFixedSizeDataFileHeader(filePath);
-
-		return new NonEncryptedFixedSizeDataFile(filePath, fileHeader);
-	}
-
-	private FixedSizeDataFileHeader readFixedSizeDataFileHeader(Path filePath) throws IOException
-	{
-		try (FileInputStream fis = new FileInputStream(filePath.toFile()))
-		{
-			return new FixedSizeDataFileHeader(fis);
-		}
-	}
-
-	private void writeFileHeader(FixedSizeDataFileHeader fileHeader) throws IOException
-	{
-		RandomAccessFile raf = new RandomAccessFile(fileHeader.toString(), "rw");
-		raf.write(fileHeader.serialize());
+		return new DefaultFixedSizeDataFile(filePath);
 	}
 
 	private void validateFileSize(Long fileSizeInBytes, Long allocationUnitSizeInBytes)

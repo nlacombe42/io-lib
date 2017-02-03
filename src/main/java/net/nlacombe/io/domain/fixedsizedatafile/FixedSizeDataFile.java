@@ -1,8 +1,7 @@
 package net.nlacombe.io.domain.fixedsizedatafile;
 
-import net.nlacombe.io.domain.ArrayAllocationTable;
+import net.nlacombe.io.util.IoUtil;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
@@ -11,19 +10,42 @@ public abstract class FixedSizeDataFile implements AutoCloseable
 {
 	private RandomAccessFile randomAccessFile;
 	private DataUnitStore dataUnitStore;
+	private FileHeaderService fileHeaderService;
+	private FixedSizeDataFileHeader fileHeader;
 
-	public FixedSizeDataFile(Path filePath, ArrayAllocationTable allocationTable, Long dataStartOffsetInBytes) throws FileNotFoundException
+	/**
+	 * Creates a new data file with fixed size.
+	 */
+	public FixedSizeDataFile(Path filePath, Long fileSizeInBytes, Long allocationUnitSizeInBytes, FileHeaderService fileHeaderService) throws IOException
 	{
+		this.fileHeaderService = fileHeaderService;
 		randomAccessFile = new RandomAccessFile(filePath.toFile(), "rw");
-		dataUnitStore = new DataUnitStore(allocationTable, randomAccessFile, dataStartOffsetInBytes);
+
+		IoUtil.writeRandomBytes(filePath, fileSizeInBytes);
+
+		this.fileHeader = new FixedSizeDataFileHeader(fileSizeInBytes, allocationUnitSizeInBytes);
+		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
+
+		dataUnitStore = new DataUnitStore(fileHeader.getAllocationTable(), randomAccessFile, fileHeaderService.getTotalFileHeaderSize(fileHeader));
 	}
 
-	protected abstract void writeAllocationTableToFile() throws IOException;
+	/**
+	 * Creates a FixedSizeDataFile from an existing file.
+	 */
+	public FixedSizeDataFile(Path filePath, FileHeaderService fileHeaderService) throws IOException
+	{
+		this.fileHeaderService = fileHeaderService;
+		randomAccessFile = new RandomAccessFile(filePath.toFile(), "rw");
+
+		this.fileHeader = fileHeaderService.readHeader(randomAccessFile);
+
+		dataUnitStore = new DataUnitStore(fileHeader.getAllocationTable(), randomAccessFile, fileHeaderService.getTotalFileHeaderSize(fileHeader));
+	}
 
 	public DataUnitAddress createDataUnit(byte[] data) throws IOException
 	{
 		DataUnitAddress address = dataUnitStore.createDataUnit(data);
-		writeAllocationTableToFile();
+		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
 
 		return address;
 	}
@@ -41,7 +63,7 @@ public abstract class FixedSizeDataFile implements AutoCloseable
 	public void deleteDataUnit(DataUnitAddress address) throws IOException
 	{
 		dataUnitStore.deleteDataUnit(address);
-		writeAllocationTableToFile();
+		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
 	}
 
 	@Override
@@ -55,10 +77,5 @@ public abstract class FixedSizeDataFile implements AutoCloseable
 		{
 			throw new RuntimeException(e);
 		}
-	}
-
-	protected RandomAccessFile getRandomAccessFile()
-	{
-		return randomAccessFile;
 	}
 }
