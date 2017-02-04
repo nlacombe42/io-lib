@@ -44,4 +44,9 @@ public class DeserializerStream extends FrameInputStream
 	{
 		return IoUtil.deserializeUuid(readFrame());
 	}
+
+	public byte[] readBytes(int numberOfBytes) throws IOException
+	{
+		return IoUtil.read(this, numberOfBytes);
+	}
 }
