@@ -66,6 +66,58 @@ public abstract class FixedSizeDataFile implements AutoCloseable
 		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
 	}
 
+	public DataUnitAddress updateVariableSizeData(DataUnitAddress oldAddress, byte[] data) throws IOException
+	{
+		dataUnitStore.deleteDataUnit(oldAddress);
+		DataUnitAddress newAddress = dataUnitStore.createDataUnit(data);
+
+		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
+
+		return newAddress;
+	}
+
+	public void createCustomHeader(byte[] data) throws IOException
+	{
+		validateCustomHeaderDoesNotExist();
+
+		DataUnitAddress customHeaderAddress = createDataUnit(data);
+
+		fileHeader.setCustomHeaderAddress(customHeaderAddress);
+		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
+	}
+
+	public void updateCustomHeader(byte[] data) throws IOException
+	{
+		DataUnitAddress customHeaderAddress = fileHeader.getCustomHeaderAddress();
+
+		if (customHeaderAddress == null)
+			throw new IllegalStateException("Custom header does not exists");
+
+		customHeaderAddress = updateVariableSizeData(customHeaderAddress, data);
+
+		fileHeader.setCustomHeaderAddress(customHeaderAddress);
+		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
+	}
+
+	public void deleteCustomHeader() throws IOException
+	{
+		DataUnitAddress customHeaderAddress = fileHeader.getCustomHeaderAddress();
+
+		if (customHeaderAddress == null)
+			throw new IllegalStateException("Custom header does not exists");
+
+		deleteDataUnit(customHeaderAddress);
+
+		fileHeader.setCustomHeaderAddress(null);
+		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
+	}
+
+	private void validateCustomHeaderDoesNotExist()
+	{
+		if (fileHeader.getCustomHeaderAddress() != null)
+			throw new IllegalStateException("Custom header already present");
+	}
+
 	@Override
 	public void close()
 	{

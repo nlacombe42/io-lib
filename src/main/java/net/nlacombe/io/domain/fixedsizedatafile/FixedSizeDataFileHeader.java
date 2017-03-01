@@ -11,6 +11,7 @@ import java.io.InputStream;
 public class FixedSizeDataFileHeader
 {
 	private ArrayAllocationTable allocationTable;
+	private DataUnitAddress customHeaderAddress;
 
 	public FixedSizeDataFileHeader(Long fileSizeInBytes, Long allocationUnitSizeInBytes)
 	{
@@ -40,6 +41,18 @@ public class FixedSizeDataFileHeader
 			ss.writeLong(allocationTable.getAllocationUnitSizeInBytes());
 			ss.writeFrame(allocationTable.toByteArray());
 
+			Long offsetInBytes = -1L;
+			Long sizeInBytes = -1L;
+
+			if (customHeaderAddress != null)
+			{
+				offsetInBytes = customHeaderAddress.getOffsetInBytes();
+				sizeInBytes = customHeaderAddress.getSizeInBytes();
+			}
+
+			ss.writeLong(offsetInBytes);
+			ss.writeLong(sizeInBytes);
+
 			return baos.toByteArray();
 		}
 		catch (IOException exception)
@@ -56,6 +69,14 @@ public class FixedSizeDataFileHeader
 			Long allocationUnitSize = ds.readLong();
 			byte[] allocationTableData = ds.readFrame();
 			allocationTable = new ArrayAllocationTable(allocationTableData, allocationUnitSize);
+
+			Long offsetInBytes = ds.readLong();
+			Long sizeInBytes = ds.readLong();
+
+			if (offsetInBytes == -1)
+				customHeaderAddress = null;
+			else
+				customHeaderAddress = new DataUnitAddress(offsetInBytes, sizeInBytes);
 		}
 		catch (IOException exception)
 		{
@@ -66,5 +87,15 @@ public class FixedSizeDataFileHeader
 	public ArrayAllocationTable getAllocationTable()
 	{
 		return allocationTable;
+	}
+
+	public DataUnitAddress getCustomHeaderAddress()
+	{
+		return customHeaderAddress;
+	}
+
+	public void setCustomHeaderAddress(DataUnitAddress customHeaderAddress)
+	{
+		this.customHeaderAddress = customHeaderAddress;
 	}
 }
