@@ -86,6 +86,16 @@ public abstract class FixedSizeDataFile implements AutoCloseable
 		fileHeaderService.writeHeader(randomAccessFile, fileHeader);
 	}
 
+	public byte[] readCustomHeader() throws IOException
+	{
+		DataUnitAddress customHeaderAddress = fileHeader.getCustomHeaderAddress();
+
+		if (customHeaderAddress == null)
+			throw new IllegalStateException("Custom header does not exists");
+
+		return readDataUnit(customHeaderAddress);
+	}
+
 	public void updateCustomHeader(byte[] data) throws IOException
 	{
 		DataUnitAddress customHeaderAddress = fileHeader.getCustomHeaderAddress();
