@@ -1,11 +1,12 @@
 package net.nlacombe.io.util;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.UUID;
@@ -90,10 +91,26 @@ public class IoUtil
 
 	public static void writeRandomBytes(Path file, Long numberOfBytes) throws IOException
 	{
-		byte[] randomBytes = new byte[numberOfBytes.intValue()];
+		final Long MAX_BLOK_SIZE = 10 * FileUtils.ONE_MB;
+		Long numberOfBytesLeft = numberOfBytes;
+		SecureRandom secureRandom = new SecureRandom();
 
-		new SecureRandom().nextBytes(randomBytes);
+		try (FileOutputStream fos = new FileOutputStream(file.toFile()))
+		{
+			while (numberOfBytesLeft > 0)
+			{
+				byte[] buffer;
 
-		Files.write(file, randomBytes);
+				if (numberOfBytesLeft > MAX_BLOK_SIZE)
+					buffer = new byte[MAX_BLOK_SIZE.intValue()];
+				else
+					buffer = new byte[numberOfBytesLeft.intValue()];
+
+				secureRandom.nextBytes(buffer);
+				fos.write(buffer);
+
+				numberOfBytesLeft -= buffer.length;
+			}
+		}
 	}
 }
