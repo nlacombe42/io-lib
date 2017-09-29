@@ -1,10 +1,10 @@
 package net.nlacombe.io.domain;
 
 import net.nlacombe.io.util.IoUtil;
-import org.apache.commons.io.Charsets;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -20,7 +20,7 @@ public class DeserializerStream extends FrameInputStream
 
 	public String readString() throws IOException
 	{
-		return new String(readFrame(), Charsets.UTF_8);
+		return new String(readFrame(), StandardCharsets.UTF_8);
 	}
 
 	public int readInteger() throws IOException

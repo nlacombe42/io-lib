@@ -1,10 +1,10 @@
 package net.nlacombe.io.domain;
 
 import net.nlacombe.io.util.IoUtil;
-import org.apache.commons.io.Charsets;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -20,7 +20,7 @@ public class SerializerStream extends FrameOutputStream
 
 	public void writeString(String string) throws IOException
 	{
-		writeFrame(string.getBytes(Charsets.UTF_8));
+		writeFrame(string.getBytes(StandardCharsets.UTF_8));
 	}
 
 	public void writeInteger(int integer) throws IOException
