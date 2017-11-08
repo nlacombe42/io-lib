@@ -4,10 +4,10 @@ apply plugin: 'maven'
 defaultTasks 'tasks'
 
 group = 'net.nlacombe'
-version = '4.0.0'
+version = '5.0.0'
 
-sourceCompatibility = 9
-targetCompatibility = 9
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
 	compile 'commons-io:commons-io:2.5'
